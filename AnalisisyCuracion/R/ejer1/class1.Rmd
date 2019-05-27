@@ -590,18 +590,13 @@ iris[1:10, "Sepal.Length"]
 set.seed(100)
 original<-iris
 iris[sample(1:nrow(iris), 40), "Sepal.Length"] <- NA
-
-#  ERROR here in MAC
-# Error: package or namespace load failed for ‘mice’ in rbind(info, getNamespaceInfo(env, "S3methods")):
- #number of columns of matrices must match (see arg 2)
-#library(mice)
+library(mice)
 ```
 
 ***
 
 ```{r echo=TRUE}
-# pertence a Mice que no lo pude instalar
-#md.pattern(iris)
+md.pattern(iris)
 ```
 
 ***
@@ -610,22 +605,12 @@ iris[sample(1:nrow(iris), 40), "Sepal.Length"] <- NA
 
 Esto puede visualizarse como
 ```{r include=FALSE}
-
-#library(VIM)
-
- 
-#Error: package or namespace load failed for 'VIM' in rbind(info, getNamespaceInfo(env, "S3methods")):
-# number of columns of matrices must match (see arg 2)
-#Execution halted
-
+library(VIM)
 ```
 
 
 ```{r echo=FALSE}
-
-# pertecene a VIM
-
-#aggr_plot <- aggr(iris, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(iris), cex.axis=.7, gap=3, ylab=c("Histogram #of missing data","Pattern"))
+aggr_plot <- aggr(iris, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(iris), cex.axis=.7, gap=3, ylab=c("Histogram #of missing data","Pattern"))
 ```
 
 ***
@@ -813,16 +798,6 @@ persp(volcano, theta = 25, phi = 30, expand = 0.5, col = "lightblue")
 ```{r echo=TRUE}
 #library(rgl)
 #plot3d(iris$Petal.Width, iris$Sepal.Length, iris$Sepal.Width)
-
- 
-
-#Error: package or namespace load failed for 'rgl' in rbind(info, getNamespaceInfo(env, "S3methods")):
- #number of columns of matrices must match (see arg 2)
-#Execution halted
-
-
-
-
 ```
 
 ***
@@ -868,54 +843,44 @@ vuelos en Nueva York en 2013.
 ```{r echo=TRUE}
 library(nycflights13)
 fligths<-nycflights13::flights
-fligths
 ```
 
 ***
 ## Practico 1: Entregar un Rmd donde se encuentren todos los vuelos que:
 
 - Que arribaron con un retraso de mas de dos horas.
-
 ```{r echo=TRUE}
 fligths_delay_2 <- fligths[fligths$dep_delay > 2,]
-
 ```
-- Volaron hacia Houston (IAH o HOU)
 
+- Volaron hacia Houston (IAH o HOU)
 ```{r echo=TRUE}
 fligths_houston <- fligths[(fligths$dest == 'HOU')  | (fligths$dest == 'IAH'), ]
 ```
+
 - Fueron operados por United, American o Delta.
-
-
 ```{r echo=TRUE}
-#airlines<-nycflights13::airlines
+airlines<-nycflights13::airlines
 fligths_carriers <- fligths[(fligths$carrier == 'UA')  | (fligths$carrier == 'AA')  | (fligths$carrier == 'DL'), ]
 ```
 
 - Salieron en Verano (Julio, Agosto y Septiembre)
-
-
 ```{r echo=TRUE}
-
 fligths_spring <- fligths[(fligths$month == 7)  | (fligths$month == 8)  | (fligths$month == 9), ]
 ```
 
-
 - Arrivaron mas de dos horas tarde, pero salieron bien.
-
 ```{r echo=TRUE}
-
 fligths_0_2 <- fligths[(fligths$dep_delay == 0)  & (fligths$arr_delay > 2), ]
 ```
 
-- Salieron entre medianoche y las 6 am.
 
 ```{r echo=TRUE}
-
 fligths_0_6 <- fligths[(fligths$hour >= 0)  & (fligths$hour <= 6), ]
-
+fligths_0_6
 ```
+
+***
 
 
 

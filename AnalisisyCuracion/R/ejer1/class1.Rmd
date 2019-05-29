@@ -406,7 +406,10 @@ mydframe[i,j]<-mydframe[i,j] + 10*sin(0.75*pi)
 Ejercicio: Mida el tiempo en una version vectorizada.
 
 ```{r}
-
+m=10; n=10;
+mymat<-replicate(m, rnorm(n)) # create matrix of normal random numbers
+mydframe=data.frame(mymat) # transform into data frame
+system.time(mydframe_vect <- mydframe + 10*sin(0.75*pi))
 ```
 
 
@@ -874,10 +877,10 @@ fligths_spring <- fligths[(fligths$month == 7)  | (fligths$month == 8)  | (fligt
 fligths_0_2 <- fligths[(fligths$dep_delay == 0)  & (fligths$arr_delay > 2), ]
 ```
 
+***
 
 ```{r echo=TRUE}
 fligths_0_6 <- fligths[(fligths$hour >= 0)  & (fligths$hour <= 6), ]
-fligths_0_6
 ```
 
 ***

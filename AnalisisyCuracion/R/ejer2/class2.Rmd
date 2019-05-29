@@ -44,9 +44,9 @@ Simplemente escribiendo "y ~ model", donde "y" sera la variable de respuesta y m
 Utilizaremos un conjunto de datos de  92 estrellas del grupo de las Hyades las cuales filtraremos por coordenadas y errores de medicion en la paralaje.
 
 ```{r echo=TRUE}
-#loc <- "http://astrostatistics.psu.edu/datasets/"
-#hip <- read.table(paste(loc,"HIP_star.dat",sep=""), header=T, fill=T)
-hip <- read.table("./HIP_star.dat", header=T, fill=T)
+loc <- "http://astrostatistics.psu.edu/datasets/"
+hip <- read.table(paste(loc,"HIP_star.dat",sep=""), header=T, fill=T)
+#hip <- read.table("./HIP_star.dat", header=T, fill=T)
 attach(hip)
 filter1 <- (RA>50 & RA<100 & DE>0 & DE<25)
 filter2 <- (pmRA>90 & pmRA<130 & pmDE>-60 & pmDE< -10)
@@ -216,7 +216,8 @@ multiplicado por su correspondiente autovalor. Debido a la ortonormalidad, la mu
 
 Si existen correlaciones entre los elementos de $$\bar{x}$$ entonces algunos de los autovalores sera cero (o un numero muy chico), estas componentes de $$\bar{y}$$ seran deshechadas en los analisis subsiguientes.
 
-Utilizar la matriz de covarianza de un conjunto de datos para encontrar una transformacion a nuevas variables que no estan correlacionadas es llamado: **Analisis de Componentes Principales** 
+Utilizar la matriz de covarianza de un conjunto de datos para encontrar una transformacion a nuevas variables que no estan correlacionadas es llamado:
+**Analisis de Componentes Principales** 
 
 Este tipo de ideas a llevado a crear tecnicas similares conocidas como TLAs (Three Letters Acronyms) entre los que podemoss mencionar: 
 Karhunnen-Loeve Transform (KLT), Independent Component  Analysis (ICA), y que conduce a las arquitecturas jerarquicas (ANNs)
@@ -328,6 +329,7 @@ su desviacion estandart, quedando entonces en algun rango de numeros negativos a
 
 La  formula de la distancia Euclidea no esta definida para datos nominales, por lo que es necesario convertir cada feature nominal en 
 algun formato numerico. Como por ejemplo con **dummy coding**.
+
 
 ***
 ### Diagnosticando Cancer:
@@ -451,14 +453,68 @@ Los valores correctos estan en la diagonal de la matriz, 98% de precision para u
 
 + Mejore el rendimiento utilizando una normalizacion con z-scores provista por la funcion scale() de R.
 
-+ Pruebe algunos valores alternativos de k=1, 5,  11, 15, 21 y seleccione el mejor valor de k.
 
-+ mientras termina su merecido cafe verifique si el resultado cambia utilizando paciente elegidos aleatoriamente para el conjunto de validacion.
+```{r echo=TRUE}
+data_n <- as.data.frame(lapply(data[2:31], scale))
+summary(data_n$V3)
+summary(data_n$V8)
+```
 
-  
+Los valores estan normalizados. Se verifica que la media ahora es 0.
+
 ***
 
 
+```{r echo=TRUE}
+data_train <- data_n[1:469, ]
+data_test  <- data_n[470:569, ] 
+data_train_labels <- data[1:469, 1]
+data_test_labels  <- data[470:569, 1]
+data_test_pred <- knn(train=data_train, test=data_test, cl=data_train_labels, k=21)
+CrossTable(x=data_test_labels, y=data_test_pred, prop.chisq = FALSE)
+```
+
+Se mantiene precision de 98%
+
+***
+
++ Pruebe algunos valores alternativos de k=1, 5,  11, 15, 21 y seleccione el mejor valor de k.
+
+
+```{r echo=TRUE}
+data_test_pred <- knn(train=data_train, test=data_test, cl=data_train_labels, k=11)
+CrossTable(x=data_test_labels, y=data_test_pred, prop.chisq = FALSE)
+```
+
+
+para K = 11,15, 21, se mantiene la precición de 98% pero con K=11 mejora la prediccion en los casos M y ademas se usan menos vecinos.
+
+***
+
++ mientras termina su merecido cafe verifique si el resultado cambia utilizando paciente elegidos aleatoriamente para el conjunto de validacion.
+
+
+Calculamos un promedio para 10000 muestras aleatorias:
+
+```{r echo=TRUE}
+data_train <- data_n[1:469, ]
+data_test  <- data_n[sample(nrow(data_n), 100), ]
+data_train_labels <- data[1:469, 1]
+data_test_labels  <- data[470:569, 1]
+data_test_pred <- knn(train=data_train, test=data_test, cl=data_train_labels, k=11)
+count <- 0
+N <- 10000
+for(i in seq(from=1, to=N, by=1)){
+  pred_result <- table(data_test_labels, data_test_pred)
+  count <- count + pred_result['B','B'] + pred_result['M', 'M'] 
+}
+
+average_predict <- count/N
+
+```
+
+
+Si la precisición se ve afectada, reduciendose en promedio a menos del 70%
 
 
 ***

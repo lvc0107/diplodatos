@@ -406,6 +406,15 @@ mydframe[i,j]<-mydframe[i,j] + 10*sin(0.75*pi)
 Ejercicio: Mida el tiempo en una version vectorizada.
 
 ```{r}
+m=10; n=10;
+mymat<-replicate(m, rnorm(n)) # create matrix of normal random numbers
+mydframe=data.frame(mymat) # transform into data frame
+# measure loop execution
+system.time(
+{
+mydframe<-mydframe + 10*sin(0.75*pi)
+}
+)
 
 ```
 
@@ -885,14 +894,14 @@ head(month_jas)
 
 - Arrivaron mas de dos horas tarde, pero salieron bien.
 ```{r}
-arr_sched_delay <- subset(flights, arr_delay > 120 | dep_delay == 0 )
+arr_sched_delay <- subset(flights, arr_delay > 120  & dep_delay == 0 )
 head(arr_sched_delay)
 
 ```
 
 - Salieron entre medianoche y las 6 am.
 ```{r}
-dep_mid_six <- subset(flights, dep_time < 360  & dep_time > 0  )
+dep_mid_six <- subset(flights, dep_time < 600 & dep_time > 0  )
 head(dep_mid_six)
 
 ```

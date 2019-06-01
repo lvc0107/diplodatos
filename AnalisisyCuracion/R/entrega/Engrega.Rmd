@@ -22,7 +22,7 @@ fligths<-nycflights13::flights
 
 - Que arribaron con un retraso de mas de dos horas.
 ```{r echo=TRUE}
-fligths_delay_2 <- fligths[fligths$dep_delay > 2,]
+fligths_delay_2 <- fligths[fligths$arr_delay > 120,]
 ```
 
 - Volaron hacia Houston (IAH o HOU)
@@ -42,22 +42,24 @@ fligths_spring <- fligths[(fligths$month == 7)  | (fligths$month == 8)  | (fligt
 ```
 
 - Arrivaron mas de dos horas tarde, pero salieron bien.
-```{r echo=TRUE}
-fligths_0_2 <- fligths[(fligths$dep_delay == 0)  & (fligths$arr_delay > 2), ]
-```
-
 
 ```{r echo=TRUE}
-fligths_0_6 <- fligths[(fligths$hour >= 0)  & (fligths$hour <= 6), ]
+fligths_0_2 <- fligths[(fligths$dep_delay == 0)  & (fligths$arr_delay > 120), ]
 ```
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+### Ejercicio: Mida el tiempo en una version vectorizada.
+
+```{r}
+m=10; n=10;
+mymat<-replicate(m, rnorm(n)) # create matrix of normal random numbers
+mydframe=data.frame(mymat) # transform into data frame
+system.time(mydframe_vect <- mydframe + 10*sin(0.75*pi))
 ```
 
 
-### Ejercicios.
+
+### Ejercicio: Clasificación de tumores.
 
 
 ```{r echo=TRUE}
@@ -67,9 +69,6 @@ data <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/breas
 data <- data[-1]
 str(data)
 ```
-
-Los valores correctos estan en la diagonal de la matriz, 98% de precision para unas pocas lineas de R!
-
 
 + Mejore el rendimiento utilizando una normalizacion con z-scores provista por la funcion scale() de R.
 
@@ -133,5 +132,33 @@ average_predict <- count/N
 
 ```
 
-
 Si la precisición se ve afectada, reduciendose en promedio a menos del 70%
+
+### Ejercicio k-means
+
+```{r echo=TRUE}
+fligths<-nycflights13::flights
+#flights_numeric <- Filter(is.numeric, flights)
+flights_numeric <- flights[,c("dep_delay", "arr_delay", "distance")]
+flights_numeric <- flights_numeric[complete.cases(flights_numeric),]
+flights_numeric_z <- scale(flights_numeric)
+head(flights_numeric_z, n = 3)
+class(flights_numeric_z)
+
+flights_numeric_z <- as.data.frame(flights_numeric_z)
+```
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(lattice)
+pairs(flights_numeric_z, pch=21)
+```
+
+```{r echo=TRUE}
+set.seed(76964057) #Set the seed for reproducibility
+flightsCluster <-kmeans(na.omit(flights_numeric_z), centers=3) #Create 5 clusters, Remove columns 1 and 2
+
+
+flightsCluster$centers #Display&nbsp;cluster centers
+table(flightsCluster$cluster) #Give a count of data points in each cluster
+```

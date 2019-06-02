@@ -136,29 +136,125 @@ Si la precisición se ve afectada, reduciendose en promedio a menos del 70%
 
 ### Ejercicio k-means
 
+- Elija un dataset clasificado de su preferencia y area (domain expertise), aplique un metodo de clustering y/o mixtura de Gaussianas en el mismo.
+
+Elejimos trabajar con el mismo dataset del practico 1 : Flights. Mostramos clusters ploteando 2 features: dep_delay, arr_delay.
+
+
 ```{r echo=TRUE}
-fligths<-nycflights13::flights
-#flights_numeric <- Filter(is.numeric, flights)
-flights_numeric <- flights[,c("dep_delay", "arr_delay", "distance")]
-flights_numeric <- flights_numeric[complete.cases(flights_numeric),]
-flights_numeric_z <- scale(flights_numeric)
-head(flights_numeric_z, n = 3)
-class(flights_numeric_z)
-
-flights_numeric_z <- as.data.frame(flights_numeric_z)
-```
-
-```{r, echo=FALSE}
+library(nycflights13)
 library(ggplot2)
-library(lattice)
-pairs(flights_numeric_z, pch=21)
-```
 
-```{r echo=TRUE}
+fligths<-nycflights13::flights
+# Filtramos solo atributos numericos
+flights_numeric <- Filter(is.numeric, flights)
+
+# eliminamos NAN values por que es un requisito de kmeans
+flights_numeric <- na.omit(flights_numeric)
+
+#primeras 3 rows del nuevo data frame
+head(flights_numeric, n = 3)
+
 set.seed(76964057) #Set the seed for reproducibility
-flightsCluster <-kmeans(na.omit(flights_numeric_z), centers=3) #Create 5 clusters, Remove columns 1 and 2
-
+#Create K clusters
+K = 3
+flightsCluster <-kmeans(flights_numeric, K, centers=K) 
 
 flightsCluster$centers #Display&nbsp;cluster centers
+
 table(flightsCluster$cluster) #Give a count of data points in each cluster
+
+flights_numeric$classes <- as.factor(flightsCluster$cluster)
+ggplot(flights_numeric, aes(dep_delay, arr_delay, colour = classes)) + geom_point()
+
 ```
+
+
+- Investigue los resultados en el meta parametro $K$ numero de cumulos e investigue posibles procesos de seleccion del mismo.
+
+Probamos para K entre 2 y 20.
+
+```{r echo=TRUE}
+library(nycflights13)
+library(ggplot2)
+
+fligths<-nycflights13::flights
+# Filtramos solo atributos numericos
+flights_numeric <- Filter(is.numeric, flights)
+
+# eliminamos NAN values por que es un requisito de kmeans
+flights_numeric <- na.omit(flights_numeric)
+
+K = 20
+
+for(i in seq(from=2, to=K, by=1)){
+
+  flightsCluster <-kmeans(flights_numeric, i, centers=i) 
+
+  print(flightsCluster$centers) #Display&nbsp;cluster centers
+
+  print(table(flightsCluster$cluster)) #Give a count of data points in each cluster
+
+  flights_numeric$classes <- as.factor(flightsCluster$cluster)
+  print(ggplot(flights_numeric, aes(dep_delay, arr_delay, colour = classes)) + geom_point())
+}
+
+```
+***
+
+
+- Elabore un resumen, y selecione un mejor valor segun el/los criterios aplicados, discuta el significado de los cumulos encontrados. 
+
+Se concluye que para datos no normalizados, no se generan clusters muy nitidos. Promabos normalizando los features
+
+
+- Comente la influencia de la normalizacion de los datos en los resultados del clustering.
+
+
+
+```{r echo=TRUE}
+library(nycflights13)
+library(ggplot2)
+fligths<-nycflights13::flights
+
+# Filtramos solo atributos numericos
+flights_numeric <- Filter(is.numeric, flights)
+
+# Normalizamos
+flights_numeric_z <- scale(flights_numeric)
+# Eliminamos la columna fecha, pues tiene algun problema cuando se normaliza
+flights_numeric_z <- subset( flights_numeric_z, select = -c(year) )
+# eliminamos NAN values por que es un requisito de kmeans
+flights_numeric_z <- na.omit(flights_numeric_z)
+
+# Casteamos a data frame
+flights_numeric_z <- as.data.frame(flights_numeric_z)
+# verificamos que tenemos un dataframe
+class(flights_numeric_z)
+
+#primeras 3 rows del nuevo data frame
+head(flights_numeric_z, n = 3)
+
+set.seed(76964057) #Set the seed for reproducibility
+#Create K clusters
+K = 20
+
+for(i in seq(from=2, to=K, by=1)){
+
+  flightsCluster <-kmeans(flights_numeric_z, i, centers=i) 
+
+  print(flightsCluster$centers) #Display&nbsp;cluster centers
+
+  print(table(flightsCluster$cluster)) #Give a count of data points in each cluster
+
+  flights_numeric_z$classes <- as.factor(flightsCluster$cluster)
+  print(ggplot(flights_numeric_z, aes(dep_delay, arr_delay, colour = classes)) + geom_point())
+}
+```
+
+***
+
+Con features normalizados se visualizan por lo menos 1 grupo que contiene la mayoria de las observaciones hasta K=14, luego de  K=15 a 19, se distinguen mas claramente 2 grupos. 
+
+
+

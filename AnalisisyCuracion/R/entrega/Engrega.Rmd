@@ -1,6 +1,10 @@
 ---
 title: "Entrega"
 output: html_document
+
+# Isabel Rivadero
+# Nahuel Almeira
+# Miguel Vargas
 ---
 
 ## Ejercicios:
